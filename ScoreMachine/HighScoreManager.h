@@ -6,16 +6,24 @@ class HighScoreManager
 {
 public:
 	HighScoreManager();
-	HighScoreManager(std::string, float, std::string);
-	void createRecord(std::string, float, std::string);
+	HighScoreManager(std::string, float, int, int, int);
+	void createRecord(std::string, float, int, int, int);
 	void updateRecord(std::string);
 	void printTopTen();
 private:
-	struct Record {
+	struct Date
+	{
+		int year;
+		int month;
+		int day;
+	};
+	struct Record 
+	{
 		std::string userName;
 		float score;
-		std::string date;
+		Date date;
 		bool operator<(const Record& r) const;
+		std::string getDate() const;
 	};
 	std::multiset<Record> records;
 	std::multiset<Record>::iterator it;

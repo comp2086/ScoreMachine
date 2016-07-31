@@ -4,9 +4,10 @@
 using namespace std;
 
 HighScoreManager::HighScoreManager() {}
-HighScoreManager::HighScoreManager(string userName, float score, string date)
+HighScoreManager::HighScoreManager(string userName, float score,
+	int year, int day, int month)
 {
-	createRecord(userName, score, date);
+	createRecord(userName, score, year, month, day);
 }
 
 bool HighScoreManager::Record::operator<(const Record& r) const
@@ -14,13 +15,16 @@ bool HighScoreManager::Record::operator<(const Record& r) const
 	return score > r.score;
 }
 
-void HighScoreManager::createRecord(string userName, float score, string date)
+void HighScoreManager::createRecord(string userName, float score,
+	int year, int month, int day)
 {
 	// Create a new record
 	Record r;
 	r.userName = userName;
 	r.score = score;
-	r.date = date;
+	r.date.year = year;
+	r.date.month = month;
+	r.date.day = day;
 
 	// Add a record to sorted collection
 	records.insert(r);
@@ -46,9 +50,16 @@ void HighScoreManager::printTopTen()
 	while (counter <= 10 && it != records.end())
 	{
 		cout << counter << ". " << (*it).userName << " "
-			<< (*it).date << " " 
+			<< (*it).getDate() << " " 
 			<< (*it).score << endl;
 		it++;
 		counter++;
 	}
+}
+
+string HighScoreManager::Record::getDate() const
+{
+	return to_string(date.year) + '-' 
+		+ to_string(date.month) + '-'
+		+ to_string(date.day);
 }
