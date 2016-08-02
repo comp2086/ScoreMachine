@@ -1,42 +1,76 @@
 #include "User.h"
+#include <fstream>
 
 using namespace std;
 
 // Default no arguments constructor
-User::User()
+User::User(int userId, double newScore)
+	: id(userId), score(newScore)
 {
+	authenticated = false;
 }
 
 // Constructor without highest score
-User::User(string userName)
+User::User(const string& userName, const string& password, int userId, double newScore)
+	: id(userId), score(newScore)
 {
-	this->userName = userName;
-	this->score = -1;
+	authenticated = false;
+	setUserName(userName);
+	setPassword(password);
 }
 
-// Constructor with highest score
-User::User(string userName, double score)
+void User::setId(int userId)
 {
-	this->userName = userName;
-	this->score = score;
+	id = userId;
 }
 
-void User::setUserName(string userName)
+void User::setUserName(const string& userName)
 {
-	this->userName = userName;
+	int N = userName.size();
+	N = N < 15 ? N : 14;
+	userName.copy(this->userName, N);
+	//this->userName[N] = '\0';
 }
 
-void User::setScore(double score)
+void User::setPassword(const string& password)
 {
-	this->score = score;
+	int N = password.size();
+	N = N < 15 ? N : 14;
+	password.copy(this->password, N);
+	//this->password[N] = '\0';
+}
+
+void User::setScore(double newScore)
+{
+	score = newScore;
+}
+
+void User::authenticate()
+{
+	authenticated = true;
+}
+
+int User::getId() const
+{
+	return id;
 }
 
 string User::getUserName() const
 {
-	return this->userName;
+	return userName;
+}
+
+string User::getPassword() const
+{
+	return password;
 }
 
 double User::getScore() const
 {
-	return this->score;
+	return score;
+}
+
+bool User::isAuthenticated() const
+{
+	return authenticated;
 }
