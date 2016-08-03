@@ -86,6 +86,7 @@ void HighScoreManager::login(User& u)
 			temp.getPassword() == u.getPassword())
 		{
 			u.setId(temp.getId());
+			u.setScore(temp.getScore());
 			u.toggleAuth();
 			break;
 		}
@@ -98,10 +99,15 @@ void HighScoreManager::login(User& u)
 
 void HighScoreManager::logout(User& u)
 {
+	// Clear all fields
+	u.setId(-1);
+	u.setUserName("");
+	u.setPassword("");
 	u.toggleAuth();
 }
 
-void HighScoreManager::deleteProfile(User& u)
+// This method handles edit/delete profile functionality
+void HighScoreManager::editProfile(User& u, bool del)
 {
 	User tempUser;
 	ifstream inFileStream;
@@ -123,6 +129,10 @@ void HighScoreManager::deleteProfile(User& u)
 		if (!(tempUser.getId() == u.getId()))
 		{
 			outFileStream.write(reinterpret_cast<const char *> (&tempUser), sizeof(User));
+		}
+		else if (!del)
+		{
+			outFileStream.write(reinterpret_cast<const char *> (&u), sizeof(User));
 		}
 
 		inFileStream.read(reinterpret_cast<char *> (&tempUser), sizeof(User));
@@ -146,9 +156,6 @@ void HighScoreManager::deleteProfile(User& u)
 
 	// Delete temporary file
 	remove("temp.dat");
-
-	// Logout
-	u.toggleAuth();
 }
 
 //bool HighScoreManager::Record::operator<(const Record& r) const

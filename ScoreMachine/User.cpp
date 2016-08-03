@@ -19,30 +19,43 @@ User::User(const string& userName, const string& password, int userId, double ne
 	setPassword(password);
 }
 
-void User::setId(int userId)
+void User::setId(int newId)
 {
-	id = userId;
+	id = newId;
 }
 
-void User::setUserName(const string& userName)
+void User::setUserName(const string& newUserName)
 {
-	int N = userName.size();
+	int N = newUserName.size();
 	N = N < 15 ? N : 14;
-	userName.copy(this->userName, N);
-	//this->userName[N] = '\0';
+	newUserName.copy(userName, N);
+	userName[N] = '\0';
 }
 
-void User::setPassword(const string& password)
+void User::setPassword(const string& newPassword)
 {
-	int N = password.size();
+	int N = newPassword.size();
 	N = N < 15 ? N : 14;
-	password.copy(this->password, N);
-	//this->password[N] = '\0';
+	newPassword.copy(password, N);
+	password[N] = '\0';
 }
 
 void User::setScore(double newScore)
 {
 	score = newScore;
+}
+
+void User::setScore(const string& newScore)
+{
+	score = strtod(newScore.c_str(), NULL);
+}
+
+void User::setDate(const string& score)
+{
+	int N = score.length();
+	N = N < 11 ? N : 10;
+	score.copy(this->date, N);
+	date[N] = '\0';
 }
 
 void User::toggleAuth()
@@ -68,6 +81,11 @@ string User::getPassword() const
 double User::getScore() const
 {
 	return score;
+}
+
+string User::getDate() const
+{
+	return date;
 }
 
 bool User::isAuthenticated() const
