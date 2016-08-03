@@ -11,7 +11,7 @@ public:
 	void setUserName(const std::string&);
 	void setPassword(const std::string&);
 	void setScore(double);
-	void authenticate();
+	void toggleAuth();
 	int getId() const;
 	std::string getUserName() const;
 	std::string getPassword() const;

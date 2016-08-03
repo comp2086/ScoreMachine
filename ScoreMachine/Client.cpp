@@ -9,7 +9,7 @@ using namespace HighScoreManager;
 void printMenu();
 void printOptions();
 void getCredentials(User&);
-int validateAnswer(int range);
+int validateAnswer(int);
 
 int main()
 {
@@ -32,21 +32,38 @@ int main()
 			case 1:
 				getCredentials(u);
 				login(u);
+
 				if (u.isAuthenticated())
 				{
+					cout << "You are now logged in" << endl;
 					bool exitOptions = false;
 
 					// 2nd level menu
-					while (!exitOptions)
+					while (!exitOptions && u.isAuthenticated())
 					{
 						printOptions();
 						menuChoice = validateAnswer(3);
+
+						switch (menuChoice)
+						{
+							case 1:
+								break;
+							case 2:
+								break;
+							case 3:
+								deleteProfile(u);
+								exitOptions = true;
+								break;
+							case 0:
+								logout(u);
+								exitOptions = true;
+								break;
+						}
 					}
 				}
 				else
 				{
-					cout << "   "
-						<< "Incorrect User Name and/or Password" 
+					cout << "Incorrect User Name and/or Password" 
 						<< endl;
 				}
 				break;

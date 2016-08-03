@@ -4,6 +4,33 @@
 
 using namespace std;
 
+// Gets the next available id from Users.dat file
+void HighScoreManager::setUserId(User& u)
+{
+	User temp;
+	ifstream inFileStream("Users.dat", ios::in | ios::binary);
+
+	/*
+	For some reason, it doesn't recognize a user object
+	if i start from the end - offset of User size
+	*/
+	//inFileStream.seekg(sizeof(User), ios::end);
+
+	// Locate the last record in the file
+	inFileStream.read(reinterpret_cast<char*>(&temp), sizeof(User));
+
+	while (inFileStream && !inFileStream.eof())
+	{
+		inFileStream.read(reinterpret_cast<char*>(&temp), sizeof(User));
+	}
+
+	// Assign the next available id to the new User record 
+	// Id is equal to 0 (empty User object if there are no records in the file)
+	u.setId(temp.getId() + 1);
+
+	inFileStream.close();
+}
+
 void HighScoreManager::saveUser(User& u, bool newUser)
 {
 	ofstream outFileStream(users, ios::in | ios::out | ios::binary);
@@ -20,6 +47,8 @@ void HighScoreManager::saveUser(User& u, bool newUser)
 	{		
 		// Set the next available id for a new user
 		setUserId(u);
+
+		// Starting to write from 0th position
 		outFileStream.seekp((u.getId() - 1) * sizeof(User));
 		outFileStream.write(reinterpret_cast<const char*>(&u), sizeof(User));
 	}
@@ -57,7 +86,7 @@ void HighScoreManager::login(User& u)
 			temp.getPassword() == u.getPassword())
 		{
 			u.setId(temp.getId());
-			u.authenticate();
+			u.toggleAuth();
 			break;
 		}
 
@@ -67,26 +96,59 @@ void HighScoreManager::login(User& u)
 	inFileStream.close();
 }
 
-// Gets the next available id from Users.dat file
-void HighScoreManager::setUserId(User& u)
+void HighScoreManager::logout(User& u)
 {
-	User temp;
-	ifstream inFileStream("Users.dat", ios::in | ios::binary);
+	u.toggleAuth();
+}
 
-	// Locate the last record in the file
-	//inFileStream.seekg(sizeof(User), ios::end);
-	inFileStream.read(reinterpret_cast<char*>(&temp), sizeof(User));
+void HighScoreManager::deleteProfile(User& u)
+{
+	User tempUser;
+	ifstream inFileStream;
+	ofstream outFileStream;
 
-	while (inFileStream && !inFileStream.eof())
+	inFileStream.open(users, ios::in | ios::binary);
+	outFileStream.open("temp.dat", ios::out | ios::binary);
+
+	if (!inFileStream || !outFileStream)
 	{
-		inFileStream.read(reinterpret_cast<char*>(&temp), sizeof(User));
+		cerr << "Users file couldn't be open";
+		exit(EXIT_FAILURE);
 	}
 
-	// Assign the next available id to the new User record 
-	// Id is equal to 0 if there are no records in the file
-	u.setId(temp.getId() + 1);
+	// Copy everything but the record we want to delete into a temporary file
+	inFileStream.read(reinterpret_cast<char *> (&tempUser), sizeof(User));
+	while (inFileStream && !inFileStream.eof())
+	{
+		if (!(tempUser.getId() == u.getId()))
+		{
+			outFileStream.write(reinterpret_cast<const char *> (&tempUser), sizeof(User));
+		}
 
+		inFileStream.read(reinterpret_cast<char *> (&tempUser), sizeof(User));
+	}
+
+	// Write back to the original file
 	inFileStream.close();
+	outFileStream.close();
+	inFileStream.open("temp.dat", ios::in | ios::binary);
+	outFileStream.open(users, ios::out | ios::binary);
+
+	inFileStream.read(reinterpret_cast<char *> (&tempUser), sizeof(User));
+	while (inFileStream && !inFileStream.eof())
+	{
+		outFileStream.write(reinterpret_cast<const char *> (&tempUser), sizeof(User));
+		inFileStream.read(reinterpret_cast<char *> (&tempUser), sizeof(User));
+	}
+
+	outFileStream.close();
+	inFileStream.close();
+
+	// Delete temporary file
+	remove("temp.dat");
+
+	// Logout
+	u.toggleAuth();
 }
 
 //bool HighScoreManager::Record::operator<(const Record& r) const

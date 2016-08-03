@@ -45,9 +45,9 @@ void User::setScore(double newScore)
 	score = newScore;
 }
 
-void User::authenticate()
+void User::toggleAuth()
 {
-	authenticated = true;
+	authenticated = !authenticated;
 }
 
 int User::getId() const
