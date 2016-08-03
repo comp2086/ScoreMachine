@@ -42,44 +42,61 @@ int main()
 					{
 						exitMenu3 = false;
 						printOptions();
-						menuChoice = validateAnswer(3);
+						menuChoice = validateAnswer(4);
 						string newProfileFields[4];
 
 						switch (menuChoice)
 						{
+							// Top 10 scores
 							case 1:
 								break;
+							// Display profile info
 							case 2:
-								// 3d level menu (Edit user profile)
+								cout << "   Your current profile" << endl;
+								cout << "   User Name: " << currentUser.getUserName() << " | ";
+								cout << "Password: " << currentUser.getPassword() << " | ";
+								cout << "Score: " << currentUser.getScore() << " | ";
+								cout << "Date: " << currentUser.getDate() << endl;
+								break;
+							// Edit user profile
+							case 3:
 								while (!exitMenu3)
 								{
+									
 									printEditOptions();
 									menuChoice = validateAnswer(5);
 
 									switch (menuChoice)
 									{
 									case 1:
-										cout << "New User Name: ";
+										cout << "New User Name (max 15 chars): ";
 										getline(cin, newProfileFields[0]);
 										break;
 									case 2:
-										cout << "New Password: ";
+										cout << "New Password (max 15 chars): ";
 										getline(cin, newProfileFields[1]);
 										break;
 									case 3:
-										cout << "New Score: ";
+										cout << "New Score [0 - 100]: ";
 										getline(cin, newProfileFields[2]);
 										break;
 									case 4:
-										cout << "New Date: ";
+										cout << "New Date (ex. 2014-01-31): ";
 										getline(cin, newProfileFields[3]);
 										break;
 									case 5:
-										currentUser.setUserName(newProfileFields[0]);
-										currentUser.setPassword(newProfileFields[1]);
-										currentUser.setScore(newProfileFields[2]);
-										currentUser.setDate(newProfileFields[3]);
+										cout << "Your changes have been saved" 
+											<< endl;
+										if (newProfileFields[0].length() > 0)
+											currentUser.setUserName(newProfileFields[0]);
+										if (newProfileFields[1].length() > 0)
+											currentUser.setPassword(newProfileFields[1]);
+										if (newProfileFields[2].length() > 0)
+											currentUser.setScore(newProfileFields[2]);
+										if (newProfileFields[3].length() > 0)
+											currentUser.setDate(newProfileFields[3]);
 										editProfile(currentUser, false);
+										exitMenu3 = true;
 										break;
 									case 0:
 										exitMenu3 = true;
@@ -87,7 +104,7 @@ int main()
 									}
 								}
 								break;
-							case 3:
+							case 4:
 								cout << "Are you sure? 1 - yes, 0 - exit" 
 									<< endl;
 								menuChoice = validateAnswer(1);
@@ -130,8 +147,7 @@ int main()
 void printMenu()
 {
 	cout << endl 
-		<< "   "
-		<< "1 - Login | 2 - Register | 0 - Exit" 
+		<< "   1 - Login | 2 - Register | 0 - Exit" 
 		<< endl 
 		<< endl;
 }
@@ -139,10 +155,10 @@ void printMenu()
 void printOptions()
 {
 	cout << endl
-		<< "   "
-		<< "1 - Display TOP 10 scores | " 
-		<< "2 - Edit Profile | "
-		<< "3 - Delete Profile | "
+		<< "   1 - Display TOP 10 scores | " 
+		<< "2 - View Profile | "
+		<< "3 - Edit Profile | "
+		<< "4 - Delete Profile | "
 		<< "0 - Logout" 
 		<< endl
 		<< endl;
@@ -151,13 +167,14 @@ void printOptions()
 void printEditOptions()
 {
 	cout << endl
-		<< "   "
-		<< "Choose what to edit"
-		<< "1 - User Name | "
+		<< "   Choose what to edit"
+		<< endl
+		<< "   1 - User Name | "
 		<< "2 - Password | "
 		<< "3 - Score | "
 		<< "4 - Date"
-		<< "5 - Save Changes"
+		<< endl
+		<< "   5 - Save Changes | "
 		<< "0 - Discard Changes"
 		<< endl
 		<< endl;

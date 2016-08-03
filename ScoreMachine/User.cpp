@@ -42,12 +42,13 @@ void User::setPassword(const string& newPassword)
 
 void User::setScore(double newScore)
 {
-	score = newScore;
+	if (!(score > 100) && !(score < 0)) score = newScore;
 }
 
-void User::setScore(const string& newScore)
+void User::setScore(const string& newScoreStr)
 {
-	score = strtod(newScore.c_str(), NULL);
+	double newScore = strtod(newScoreStr.c_str(), NULL);
+	setScore(newScore);
 }
 
 void User::setDate(const string& score)
