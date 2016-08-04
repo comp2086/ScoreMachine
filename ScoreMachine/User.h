@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <ctime>
 
 class User
 {
@@ -12,6 +13,7 @@ public:
 	void setPassword(const std::string&);
 	void setScore(double);
 	void setScore(const std::string&);
+	void setDate(int, int, int);
 	void setDate(const std::string&);
 	void toggleAuth();
 	int getId() const;
@@ -22,10 +24,10 @@ public:
 	bool isAuthenticated() const;
 private:
 	unsigned int id;
-	char userName[ 15 ];
-	char password[ 15 ];
+	char userName[ 16 ];
+	char password[ 16 ];
 	double score;
-	char date[11];
+	char date[ 30 ];
 	bool authenticated;
 };
 

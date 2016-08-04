@@ -11,6 +11,7 @@ void printOptions();
 void printEditOptions();
 void getCredentials(User&);
 int validateAnswer(int);
+void validateProfileFields(string&, int, int);
 
 int main()
 {
@@ -28,7 +29,7 @@ int main()
 
 		switch (menuChoice)
 		{
-			// User selects the 1st option and is logged into the system
+			// Login
 			case 1:
 				getCredentials(currentUser);
 				login(currentUser);
@@ -43,7 +44,7 @@ int main()
 						exitMenu3 = false;
 						printOptions();
 						menuChoice = validateAnswer(4);
-						string newProfileFields[4];
+						string newProfileFields[6];
 
 						switch (menuChoice)
 						{
@@ -52,6 +53,7 @@ int main()
 								break;
 							// Display profile info
 							case 2:
+								cout << endl;
 								cout << "   Your current profile" << endl;
 								cout << "   User Name: " << currentUser.getUserName() << " | ";
 								cout << "Password: " << currentUser.getPassword() << " | ";
@@ -62,7 +64,6 @@ int main()
 							case 3:
 								while (!exitMenu3)
 								{
-									
 									printEditOptions();
 									menuChoice = validateAnswer(5);
 
@@ -77,12 +78,16 @@ int main()
 										getline(cin, newProfileFields[1]);
 										break;
 									case 3:
-										cout << "New Score [0 - 100]: ";
-										getline(cin, newProfileFields[2]);
+										cout << "New Score [1 - 100]: ";
+										validateProfileFields(newProfileFields[2], 0, 100);
 										break;
 									case 4:
-										cout << "New Date (ex. 2014-01-31): ";
-										getline(cin, newProfileFields[3]);
+										cout << "New Year [2010 - 2050]: ";
+										validateProfileFields(newProfileFields[3], 2010, 2050);
+										cout << "New Month [1 - 12]: " ;
+										validateProfileFields(newProfileFields[4], 1, 12);
+										cout << "New Day [1 - 31]: ";
+										validateProfileFields(newProfileFields[5], 1, 31);
 										break;
 									case 5:
 										cout << "Your changes have been saved" 
@@ -94,7 +99,9 @@ int main()
 										if (newProfileFields[2].length() > 0)
 											currentUser.setScore(newProfileFields[2]);
 										if (newProfileFields[3].length() > 0)
-											currentUser.setDate(newProfileFields[3]);
+											currentUser.setDate(stoi(newProfileFields[3]),
+												stoi(newProfileFields[4]),
+												stoi(newProfileFields[5]));
 										editProfile(currentUser, false);
 										exitMenu3 = true;
 										break;
@@ -128,12 +135,14 @@ int main()
 						<< endl;
 				}
 				break;
-			// User selects the 2nd option and is registered in the system
+			// Register
 			case 2:
 				getCredentials(currentUser);
 				saveUser(currentUser, true);
-				cout << "You can now login using your User Name and Password" 
-					<< endl;
+				if (currentUser.getId() == 0)
+					cout << "This User Name has already been taken, try a different one" << endl;
+				else
+					cout << "You can now login using your User Name and Password" << endl;
 				break;
 			case 0:
 				exitMenu1 = true;
@@ -198,11 +207,8 @@ int validateAnswer(int range)
 	int answer = -1;
 	string userInput = "";
 	string errMsg = "Invalid input, please enter ";
-	for (int i = 1; i <= range; i++)
-	{
-		errMsg += to_string(i);
-		errMsg += i < range ? ", " : " or 0 to exit: ";
-	}
+
+		errMsg += "1 - " + to_string(range) + " or 0 to Exit: ";
 
 	cout << "Your choice: ";
 	while (getline(cin, userInput))
@@ -233,4 +239,40 @@ int validateAnswer(int range)
 	}
 
 	return answer;
+}
+
+void validateProfileFields(string& newDateField, int low, int high)
+{
+	int answer;
+	string userInput;
+	string errMsg = "Please enter a value in range [" 
+		+ to_string(low) + " - " + to_string(high) + "]: ";
+
+	while (getline(cin, userInput))
+	{
+		stringstream strStream(userInput);
+		if (!(strStream >> answer))
+		{
+			cout << errMsg;
+			continue;
+		}
+
+		if ((answer > high) || (answer < low))
+		{
+			cout << errMsg;
+			continue;
+		}
+		char badChar;
+		if (strStream >> badChar)
+		{
+			// If there was something after the number, e.g 2a
+			cout << errMsg;
+			continue;
+		}
+
+		// Input validated, quit the loop
+		break;
+	}
+
+	newDateField = userInput;
 }

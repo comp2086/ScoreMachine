@@ -3,14 +3,15 @@
 
 using namespace std;
 
-// Default no arguments constructor
 User::User(int userId, double newScore)
 	: id(userId), score(newScore)
 {
 	authenticated = false;
+
+	// Set default date
+	setDate(2016, 1, 1);
 }
 
-// Constructor without highest score
 User::User(const string& userName, const string& password, int userId, double newScore)
 	: id(userId), score(newScore)
 {
@@ -45,18 +46,38 @@ void User::setScore(double newScore)
 	if (!(score > 100) && !(score < 0)) score = newScore;
 }
 
+// Overloaded setter with a string parameter
 void User::setScore(const string& newScoreStr)
 {
 	double newScore = strtod(newScoreStr.c_str(), NULL);
 	setScore(newScore);
 }
 
-void User::setDate(const string& score)
+void User::setDate(int year, int month, int day)
 {
-	int N = score.length();
-	N = N < 11 ? N : 10;
-	score.copy(this->date, N);
-	date[N] = '\0';
+	time_t rawtime;
+	struct tm* temp = new tm();
+	
+	temp->tm_year = year - 1900;
+	temp->tm_mon = month - 1;
+	temp->tm_mday = day;
+	// Set daylight savings to 0 for a generic 00:00:00 time
+	temp->tm_isdst = 0;
+
+	rawtime = mktime(temp);
+	char* dt = ctime(&rawtime);
+	string newDate = dt;
+	int N = newDate.length();
+
+	newDate.copy(date, N);
+	// ctime returns newline as the last character, replace it
+	date[N - 1] = '\0';
+}
+
+// Overloaded setDate to assign date read from the file
+void User::setDate(const string& newDate)
+{
+	newDate.copy(date, newDate.length());
 }
 
 void User::toggleAuth()

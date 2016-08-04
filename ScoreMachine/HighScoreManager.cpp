@@ -8,6 +8,7 @@ using namespace std;
 void HighScoreManager::setUserId(User& u)
 {
 	User temp;
+	bool exists = false;
 	ifstream inFileStream("Users.dat", ios::in | ios::binary);
 
 	/*
@@ -19,14 +20,16 @@ void HighScoreManager::setUserId(User& u)
 	// Locate the last record in the file
 	inFileStream.read(reinterpret_cast<char*>(&temp), sizeof(User));
 
-	while (inFileStream && !inFileStream.eof())
+	while (inFileStream && !inFileStream.eof() && !exists)
 	{
+		// If a username exists, do not assign id
+		if (temp.getUserName() == u.getUserName()) exists = true;
 		inFileStream.read(reinterpret_cast<char*>(&temp), sizeof(User));
 	}
 
 	// Assign the next available id to the new User record 
 	// Id is equal to 0 (empty User object if there are no records in the file)
-	u.setId(temp.getId() + 1);
+	if (!exists) u.setId(temp.getId() + 1);
 
 	inFileStream.close();
 }
@@ -47,10 +50,14 @@ void HighScoreManager::saveUser(User& u, bool newUser)
 	{		
 		// Set the next available id for a new user
 		setUserId(u);
-
-		// Starting to write from 0th position
-		outFileStream.seekp((u.getId() - 1) * sizeof(User));
-		outFileStream.write(reinterpret_cast<const char*>(&u), sizeof(User));
+		
+		// If a username available, create a new user
+		if (u.getId() != 0)
+		{
+			// Starting to write from 0th position
+			outFileStream.seekp((u.getId() - 1) * sizeof(User));
+			outFileStream.write(reinterpret_cast<const char*>(&u), sizeof(User));
+		}
 	}
 	// We're updating an existing user
 	else
@@ -87,6 +94,7 @@ void HighScoreManager::login(User& u)
 		{
 			u.setId(temp.getId());
 			u.setScore(temp.getScore());
+			u.setDate(temp.getDate());
 			u.toggleAuth();
 			break;
 		}
@@ -103,6 +111,8 @@ void HighScoreManager::logout(User& u)
 	u.setId(-1);
 	u.setUserName("");
 	u.setPassword("");
+	u.setScore(0);
+	u.setDate("");
 	u.toggleAuth();
 }
 
