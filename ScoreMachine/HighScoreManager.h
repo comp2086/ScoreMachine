@@ -10,6 +10,8 @@ namespace HighScoreManager
 	void login(User&);
 	void logout(User&);
 	void editProfile(User &, bool del);
+	bool userNameAvailable(const std::string&);
+	void printTopTen();
 	//std::multiset<User> records;
 	//std::multiset<User>::iterator it;
 

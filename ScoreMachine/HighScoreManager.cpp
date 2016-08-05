@@ -1,6 +1,7 @@
 #include "HighScoreManager.h"
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -168,27 +169,86 @@ void HighScoreManager::editProfile(User& u, bool del)
 	remove("temp.dat");
 }
 
-//bool HighScoreManager::Record::operator<(const Record& r) const
-//{
-//	return score > r.score;
-//}
+bool HighScoreManager::userNameAvailable(const string& userName)
+{
+	User temp;
+	ifstream inFileStream("Users.dat", ios::in | ios::binary);
 
-//void HighScoreManager::printTopTen()
-//{
-//	// Counter
-//	int counter = 1;
-//
-//	// Iterator for the records collection
-//	it = records.begin();
-//
-//	// Iterate through the records starting at the beginning 
-//	// until top 10 records were printed out
-//	while (counter <= 10 && it != records.end())
-//	{
-//		cout << counter << ". " << (*it).userName << " "
-//			<< (*it).getDate() << " " 
-//			<< (*it).score << endl;
-//		it++;
-//		counter++;
-//	}
-//}
+	inFileStream.read(reinterpret_cast<char*>(&temp), sizeof(User));
+
+	while (inFileStream && !inFileStream.eof())
+	{
+		// If a username exists, do not assign id
+		if (temp.getUserName() == userName)
+		{
+			inFileStream.close();
+			return false;
+		}
+		inFileStream.read(reinterpret_cast<char*>(&temp), sizeof(User));
+	}
+
+	inFileStream.close();
+	return true;
+}
+
+void HighScoreManager::printTopTen()
+{
+	// Counter
+	int counter = 0;
+	User tempUser;
+	ifstream inFileStream("Users.dat", ios::in | ios::binary);
+
+	// Array to hold top 10
+	User topTen[10];
+	
+	inFileStream.read(reinterpret_cast<char *> (&tempUser), sizeof(User));
+	
+	while (inFileStream && inFileStream.good())
+	{
+		// Just add a User record if it's empty
+		if (counter < 10)
+		{
+			topTen[counter] = tempUser;
+			counter++;
+		}
+		else
+		{
+			// Store a record only if it's larger 
+			// than the last(and the smallest) element
+			if (tempUser > topTen[counter - 1]) topTen[counter - 1] = tempUser;
+		}
+
+		// Sort
+		for (int i = counter - 1; i > 0; i--)
+		{
+			if (topTen[i] > topTen[i - 1])
+			{
+				topTen[i] = topTen[i - 1];
+				topTen[i - 1] = tempUser;
+			}
+			else break;
+		}
+
+		inFileStream.read(reinterpret_cast<char *> (&tempUser), sizeof(User));
+	}
+
+	// Print it all out
+	cout << endl
+		<< left
+		<< setw(9) << "Ranking"
+		<< setw(15) << "User Name"
+		<< setw(30) << "Date" 
+		<< right << setw(7) << "Score" << endl;
+
+	for (int i = 0; i < counter; i++)
+	{
+		// Dont print out empty User objects
+		// that get created when declaring an array
+		if (topTen[i].getId() != 0)
+			cout << left << setw(9) << to_string(i + 1) + "."
+			<< setw(15) << topTen[i].getUserName()
+			<< setw(30) << topTen[i].getDate()
+			<< right << setw(7) << setprecision(4) << topTen[i].getScore()
+			<< endl;
+	}
+}

@@ -22,6 +22,7 @@ public:
 	double getScore() const;
 	std::string getDate() const;
 	bool isAuthenticated() const;
+	bool operator >(const User&) const;
 private:
 	unsigned int id;
 	char userName[ 16 ];

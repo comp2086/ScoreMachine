@@ -114,3 +114,8 @@ bool User::isAuthenticated() const
 {
 	return authenticated;
 }
+
+bool User::operator >(const User& u) const
+{
+	return getScore() > u.getScore();
+}

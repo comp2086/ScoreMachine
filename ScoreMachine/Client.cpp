@@ -11,7 +11,8 @@ void printOptions();
 void printEditOptions();
 void getCredentials(User&);
 int validateAnswer(int);
-void validateProfileFields(string&, int, int);
+void validateScore(string&);
+void validateDateFields(string&, int, int);
 
 int main()
 {
@@ -50,6 +51,7 @@ int main()
 						{
 							// Top 10 scores
 							case 1:
+								printTopTen();
 								break;
 							// Display profile info
 							case 2:
@@ -72,6 +74,11 @@ int main()
 									case 1:
 										cout << "New User Name (max 15 chars): ";
 										getline(cin, newProfileFields[0]);
+										while (!userNameAvailable(newProfileFields[0]))
+										{
+											cout << "This User Name has already been taken, enter a new one: ";
+											getline(cin, newProfileFields[0]);
+										}
 										break;
 									case 2:
 										cout << "New Password (max 15 chars): ";
@@ -79,15 +86,15 @@ int main()
 										break;
 									case 3:
 										cout << "New Score [1 - 100]: ";
-										validateProfileFields(newProfileFields[2], 0, 100);
+										validateScore(newProfileFields[2]);
 										break;
 									case 4:
 										cout << "New Year [2010 - 2050]: ";
-										validateProfileFields(newProfileFields[3], 2010, 2050);
+										validateDateFields(newProfileFields[3], 2010, 2050);
 										cout << "New Month [1 - 12]: " ;
-										validateProfileFields(newProfileFields[4], 1, 12);
+										validateDateFields(newProfileFields[4], 1, 12);
 										cout << "New Day [1 - 31]: ";
-										validateProfileFields(newProfileFields[5], 1, 31);
+										validateDateFields(newProfileFields[5], 1, 31);
 										break;
 									case 5:
 										cout << "Your changes have been saved" 
@@ -241,7 +248,42 @@ int validateAnswer(int range)
 	return answer;
 }
 
-void validateProfileFields(string& newDateField, int low, int high)
+void validateScore(string& newDateField)
+{
+	double answer;
+	string userInput;
+	string errMsg = "Please enter a value in range [0 - 100]: ";
+
+	while (getline(cin, userInput))
+	{
+		stringstream strStream(userInput);
+		if (!(strStream >> answer))
+		{
+			cout << errMsg;
+			continue;
+		}
+
+		if ((answer > 100) || (answer < 0))
+		{
+			cout << errMsg;
+			continue;
+		}
+		char badChar;
+		if (strStream >> badChar)
+		{
+			// If there was something after the number, e.g 2a
+			cout << errMsg;
+			continue;
+		}
+
+		// Input validated, quit the loop
+		break;
+	}
+
+	newDateField = to_string(answer) ;
+}
+
+void validateDateFields(string& newDateField, int low, int high)
 {
 	int answer;
 	string userInput;
